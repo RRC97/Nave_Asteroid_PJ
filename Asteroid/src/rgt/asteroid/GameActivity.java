@@ -10,6 +10,7 @@ public class GameActivity extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        setTheme(android.R.style.Theme_NoTitleBar_Fullscreen);
         setContentView(new GameView(this));
     }
 }
