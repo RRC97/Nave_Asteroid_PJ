@@ -28,23 +28,31 @@ public class Player
     public void draw(Canvas arg0)
     {
         Paint paint = new Paint();
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.BLACK);
+        
+        arg0.translate(x, y);
+        arg0.rotate(angle * (float)(180/Math.PI));
+        
+        Path path = new Path();
+        path.moveTo(-10, 10);
+        path.lineTo(0, -10);
+        path.lineTo(10, 10);
+        path.lineTo(0, 5);
+        path.lineTo(-10, 10);
+        
+        arg0.drawPath(path, paint);
+        
         paint.setStyle(Paint.Style.STROKE);
         paint.setColor(Color.WHITE);
         
-        Path path = new Path();
-        path.moveTo(x - 10, y + 10);
-        path.lineTo(x, y - 10);
-        path.lineTo(x + 10, y + 10);
-        path.lineTo(x, y + 5);
-        path.lineTo(x - 10, y + 10);
-        
-        arg0.drawPath(path, paint);
-        paint.setStyle(Paint.Style.FILL);
         arg0.drawPath(path, paint);
     }
     
     public void update()
     {
+        //angle += 0.1f;
         
+        if(angle > 360) angle -= 360;
     }
 }
