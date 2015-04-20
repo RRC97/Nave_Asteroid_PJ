@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:onClick="clickScreen"
+    android:gravity="center"
+    >
+<TextView  
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:text="TAP TO PLAY AGAIN"
+    android:gravity="center_horizontal"
+    android:textSize="24dp" 
+    />
+<TextView  
+    android:id="@+id/score"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content"
+    android:textSize="48dp" 
+    android:text="SCORE: 0"
+    android:gravity="center_horizontal"
+    />
+</LinearLayout>
+

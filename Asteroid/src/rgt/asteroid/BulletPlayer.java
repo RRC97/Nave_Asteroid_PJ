@@ -64,6 +64,25 @@ public class BulletPlayer
         }
     }
     
+    public float getX()
+    {
+        return x;
+    }
+    public float getY()
+    {
+        return y;
+    }
+    
+    public void setX(float arg0)
+    {
+        x = arg0;
+    }
+    
+    public void setY(float arg0)
+    {
+        y = arg0;
+    }
+    
     public boolean isInvalidate()
     {
         return invalidate;

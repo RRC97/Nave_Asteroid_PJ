@@ -5,10 +5,10 @@
  */
 package rgt.asteroid;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
+import android.graphics.Rect;
 
 /**
  *
@@ -19,12 +19,14 @@ public class Button
     private float x, y, width, height;
     private int indexTouch;
     private boolean pressed, cancel;
-    public Button(float arg0, float arg1, float arg2, float arg3)
+    private Bitmap bitmap;
+    public Button(Bitmap arg0, float arg1, float arg2, float arg3, float arg4)
     {
-        x = arg0;
-        y = arg1;
-        width = arg2;
-        height = arg3;
+        bitmap = arg0;
+        x = arg1;
+        y = arg2;
+        width = arg3;
+        height = arg4;
         indexTouch = -1;
     }
     
@@ -32,13 +34,15 @@ public class Button
     {
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.RED);
-        paint.setAlpha(48);
+        paint.setAlpha(128);
         
         arg0.save();
         
         arg0.translate(x, y);
-        arg0.drawRect(0, 0, width, height, paint);
+        
+        Rect bitmapRect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        
+        arg0.drawBitmap(bitmap, bitmapRect, new Rect(0, 0, (int)width, (int)height), paint);
         
         arg0.restore();
     }

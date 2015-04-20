@@ -3,14 +3,26 @@
       package="rgt.asteroid"
       android:versionCode="1"
       android:versionName="1.0">
-    <application android:label="@string/app_name" >
-        <activity android:name="GameActivity"
+    <application android:label="@string/app_name"
+                 android:icon="@drawable/icon">
+        <activity android:name="HomeActivity"
                   android:label="@string/app_name"
-                  android:screenOrientation="landscape">
+                  android:screenOrientation="landscape"
+                  android:theme="@style/main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name="GameActivity"
+                  android:label="@string/app_name"
+                  android:screenOrientation="landscape"
+                  android:theme="@style/main">
+        </activity>
+        <activity android:name="GoverActivity"
+                  android:label="@string/app_name"
+                  android:screenOrientation="landscape"
+                  android:theme="@style/main">
         </activity>
     </application>
 </manifest> 

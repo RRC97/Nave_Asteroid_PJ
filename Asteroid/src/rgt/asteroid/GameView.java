@@ -6,6 +6,11 @@
 package rgt.asteroid;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Handler;
 import android.view.MotionEvent;
@@ -24,13 +29,18 @@ public class GameView extends View implements Runnable
     private Button acelerate, fire, rotateLeft, rotateRight;
     private Button[] buttons;
     private int lastPointerCount;
+    private AsteroidManager asteroidManager;
+    private boolean running, stop;
     public GameView(Context context)
     {
         super(context);
         
-        widthScreen = context.getResources().getDisplayMetrics().widthPixels;
-        heightScreen = context.getResources().getDisplayMetrics().heightPixels;
-        context.getResources().getDisplayMetrics().densityDpi = 240;
+        running = true;
+        stop = true;
+        Resources res = context.getResources();
+        
+        widthScreen = res.getDisplayMetrics().widthPixels;
+        heightScreen = res.getDisplayMetrics().heightPixels;
         
         setKeepScreenOn(true);
         
@@ -38,12 +48,19 @@ public class GameView extends View implements Runnable
         
         bg = new Background(widthScreen, widthScreen);
         
-        acelerate = new Button(widthScreen - 70, heightScreen - 70, 60, 60);
-        fire = new Button(widthScreen - 140, heightScreen - 70, 60, 60);
-        rotateLeft = new Button(10, heightScreen - 70, 60, 60);
-        rotateRight = new Button(80, heightScreen - 70, 60, 60);
+        Bitmap button1 = BitmapFactory.decodeResource(res, R.drawable.button1);
+        Bitmap button2 = BitmapFactory.decodeResource(res, R.drawable.button2);
+        Bitmap button3 = BitmapFactory.decodeResource(res, R.drawable.button3);
+        Bitmap button4 = BitmapFactory.decodeResource(res, R.drawable.button4);
+        
+        acelerate = new Button(button4, widthScreen - 70, heightScreen - 70, 60, 60);
+        fire = new Button(button3, widthScreen - 140, heightScreen - 70, 60, 60);
+        rotateLeft = new Button(button1, 10, heightScreen - 70, 60, 60);
+        rotateRight = new Button(button2, 80, heightScreen - 70, 60, 60);
         
         buttons = new Button[]{acelerate, fire, rotateLeft, rotateRight};
+        
+        asteroidManager = new AsteroidManager(widthScreen, heightScreen);
         
         handler = new Handler();
         handler.postDelayed(this, 1);
@@ -52,15 +69,23 @@ public class GameView extends View implements Runnable
     @Override
     public void run()
     {
-        onUpdate();
-        invalidate();
+        if(!stop)
+        {
+            onUpdate();
+            invalidate();
+        }
         
-        handler.postDelayed(this, 1);
+        if(running)
+            handler.postDelayed(this, 1);
     }
     
     public void onUpdate()
     {
         player.update();
+        asteroidManager.update();
+        
+        player.remoteBullet(asteroidManager.collideAsteroidsWithBullet(player.getBullets()));
+        
         if(rotateLeft.isPressed())
         {
             player.rotate(-6);
@@ -78,16 +103,40 @@ public class GameView extends View implements Runnable
             fire.onCancel();
             player.fire();
         }
+        
+        if(asteroidManager.collideAsteroidsWithPlayer(player.getRegion()))
+            onCloseGame();
+    }
+    
+    public void onCloseGame()
+    {
+        Activity activity = (Activity)getContext();
+        running = false;
+        handler = null;
+        Intent intent = new Intent(activity, GoverActivity.class);
+        intent.putExtra("Score", player.getScore());
+        activity.startActivity(intent);
+        activity.finish();
     }
     
     @Override
     public void onDraw(Canvas canvas)
     {
         bg.draw(canvas);
+        asteroidManager.draw(canvas);
         player.draw(canvas);
         for (Button button : buttons) {
             button.draw(canvas);
         }
+    }
+    
+    public void pause()
+    {
+        stop = true;
+    }
+    public void play()
+    {
+        stop = false;
     }
     
     @Override
@@ -117,8 +166,14 @@ public class GameView extends View implements Runnable
                 {
                     switch (action)
                     {
+                        case MotionEvent.ACTION_DOWN:
+                        button.onClickDown(pointerX, pointerY, id);
+                        break;
                         case MotionEvent.ACTION_POINTER_DOWN:
-                            button.onClickDown(pointerX, pointerY, id);
+                                button.onClickDown(pointerX, pointerY, id);
+                                break;
+                        case MotionEvent.ACTION_UP:
+                            button.onClickUp(id);
                             break;
                         case MotionEvent.ACTION_POINTER_UP:
                             button.onClickUp(id);

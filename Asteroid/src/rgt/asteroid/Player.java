@@ -3,8 +3,11 @@ package rgt.asteroid;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.RectF;
+import android.graphics.Region;
 import java.util.ArrayList;
 
 /*
@@ -22,13 +25,25 @@ public class Player
     private float x, y, angle, speedX, speedY;
     private float screenWidth, screenHeight;
     private ArrayList<BulletPlayer> bullets;
+    private int score;
+    private Path path;
     public Player(float arg0, float arg1)
     {
         bullets = new ArrayList<BulletPlayer>();
+        speedX = (float)(Math.random()) - 0.5f;
+        speedY = (float)(Math.random()) - 0.5f;
         screenWidth = arg0;
         screenHeight = arg1;
         x = screenWidth / 2;
         y = screenHeight / 2;
+        
+        path = new Path();
+        path.moveTo(x-10, y+10);
+        path.lineTo(x, y-10);
+        path.lineTo(x+10, y+10);
+        path.lineTo(x, y+5);
+        path.lineTo(x-10, y+10);
+        path.close();
     }
     
     public void draw(Canvas arg0)
@@ -43,10 +58,17 @@ public class Player
             get.draw(arg0);
         }
         
+        Paint paintScore = new Paint(Paint.LINEAR_TEXT_FLAG);
+        paintScore.setTextAlign(Paint.Align.RIGHT);
+        paintScore.setColor(Color.WHITE);
+        paintScore.setAlpha(128);
+        paintScore.setTextSize(32);
+        arg0.drawText(""+score, screenWidth - 10, 32, paintScore);
+        
         arg0.save();
         arg0.rotate(angle, x, y);
         
-        Path path = new Path();
+        path = new Path();
         path.moveTo(x-10, y+10);
         path.lineTo(x, y-10);
         path.lineTo(x+10, y+10);
@@ -85,6 +107,24 @@ public class Player
         angle += arg0;
     }
     
+    public int getScore()
+    {
+       return score; 
+    }
+    
+    public Region getRegion()
+    {
+        Matrix matrix = new Matrix();
+        matrix.setRotate(angle, x, y);
+        Path pathRotated = new Path(path);
+        pathRotated.transform(matrix);
+        
+        Region region = new Region();
+        region.setPath(pathRotated, new Region(0, 0, (int)screenWidth, (int)screenHeight));
+        
+        return region;
+    }
+    
     public void update()
     {
         //angle += 0.1f;
@@ -110,15 +150,18 @@ public class Player
             BulletPlayer get = bullets.get(i);
             get.update();
             
-            if(get.x - 2 > screenWidth)
-            get.x -= screenWidth + 4;
-            if(get.x + 2 < 0)
-                get.x += screenWidth + 4;
+            float xBullet = get.getX();
+            float yBullet = get.getY();
+            
+            if(xBullet - 4 > screenWidth)
+                get.setX(xBullet - screenWidth + 8);
+            if(xBullet + 4 < 0)
+                get.setX(xBullet + screenWidth + 8);
 
-            if(get.y - 2 > screenHeight)
-                get.y -= screenHeight + 4;
-            if(get.y + 2 < 0)
-                get.y += screenHeight + 4;
+            if(yBullet - 4 > screenHeight)
+                get.setY(yBullet - screenHeight + 8);
+            if(yBullet + 4 < 0)
+                get.setY(yBullet + screenHeight + 8);
             
             if(get.isInvalidate())removeBullet.add(get);
         }
@@ -128,5 +171,19 @@ public class Player
             BulletPlayer get = removeBullet.get(i);
             bullets.remove(get);
         }
+    }
+    
+    public void remoteBullet(BulletPlayer bullet)
+    {
+        if(bullet != null)
+            score += 10;
+        bullets.remove(bullet);
+    }
+    
+    public BulletPlayer[] getBullets()
+    {
+        BulletPlayer[] result = new BulletPlayer[bullets.size()];
+        result = bullets.toArray(result);
+        return result;
     }
 }
