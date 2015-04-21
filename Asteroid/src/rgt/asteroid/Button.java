@@ -50,12 +50,19 @@ public class Button
     public void onClickDown(float arg0, float arg1, int arg2)
     {
         if(arg0 > x && arg0 < x + width
-        && arg1 > y && arg1 < y + height)
+        && arg1 > y && arg1 < y + height
+        && indexTouch < 0)
         {
             indexTouch = arg2;
             pressed = true;
         }
     }
+    
+    public int getIndex()
+    {
+        return indexTouch;
+    }
+    
     public void onCancel()
     {
         cancel = true;
@@ -63,11 +70,15 @@ public class Button
     
     public void onClickUp(int arg0)
     {
-        if(indexTouch == arg0 || arg0 == -1)
+        if(indexTouch == arg0)
         {
             indexTouch = -1;
             pressed = false;
             cancel = false;
+        }
+        else if(arg0 < 0)
+        {
+            indexTouch += arg0;
         }
     }
             

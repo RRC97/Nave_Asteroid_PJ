@@ -28,7 +28,6 @@ public class GameView extends View implements Runnable
     private float heightScreen, widthScreen;
     private Button acelerate, fire, rotateLeft, rotateRight;
     private Button[] buttons;
-    private int lastPointerCount;
     private AsteroidManager asteroidManager;
     private boolean running, stop;
     public GameView(Context context)
@@ -142,80 +141,40 @@ public class GameView extends View implements Runnable
     @Override
     public boolean onTouchEvent(MotionEvent me)
     {
-        int action = me.getAction() & MotionEvent.ACTION_MASK;
+        int action = me.getActionMasked();
+        int actionIndex = me.getActionIndex();
         int pointerCount = me.getPointerCount();
-        if(pointerCount > 1)
+        
+        int pointerId = me.getPointerId(actionIndex);
+        int index = me.findPointerIndex(pointerId);
+        float pointerX = me.getX(index);
+        float pointerY = me.getY(index);
+        for (Button button : buttons)
         {
-            if(lastPointerCount == 1)
+            switch (action)
             {
-                for (Button button : buttons)
-                {
-                    button.onClickUp(-1);
-                }
-            }
-            for(int i = 0; i < pointerCount; i++)
-            {
-                int pointerId = me.getPointerId(i);
-                int index = me.findPointerIndex(pointerId);
-                int id = (pointerCount - 1) - index;
-
-                float pointerX = me.getX(index);
-                float pointerY = me.getY(index);
-                int size = 0;
-                for (Button button : buttons)
-                {
-                    switch (action)
-                    {
-                        case MotionEvent.ACTION_DOWN:
-                        button.onClickDown(pointerX, pointerY, id);
+                case MotionEvent.ACTION_DOWN:
+                    button.onClickDown(pointerX, pointerY, index);
+                break;
+                case MotionEvent.ACTION_POINTER_DOWN:
+                        button.onClickDown(pointerX, pointerY, index);
                         break;
-                        case MotionEvent.ACTION_POINTER_DOWN:
-                                button.onClickDown(pointerX, pointerY, id);
-                                break;
-                        case MotionEvent.ACTION_UP:
-                            button.onClickUp(id);
-                            break;
-                        case MotionEvent.ACTION_POINTER_UP:
-                            button.onClickUp(id);
-                            break;
-                    }
-                }
+                case MotionEvent.ACTION_UP:
+                    button.onClickUp(index);
+                    break;
+                case MotionEvent.ACTION_POINTER_UP:
+                    button.onClickUp(index);
+                    break;
             }
         }
-        else
+        for (Button button : buttons)
         {
-            if(lastPointerCount > 1)
+            if(button.getIndex() >= pointerCount)
             {
-                for (Button button : buttons)
-                {
-                    button.onClickUp(-1);
-                }
-            }
-            int pointerId = me.getPointerId(0);
-            int index = me.findPointerIndex(pointerId);
-            float pointerX = me.getX(index);
-            float pointerY = me.getY(index);
-            for (Button button : buttons)
-            {
-                switch (action)
-                {
-                    case MotionEvent.ACTION_DOWN:
-                        button.onClickDown(pointerX, pointerY, 0);
-                        break;
-                    case MotionEvent.ACTION_POINTER_DOWN:
-                            button.onClickDown(pointerX, pointerY, 0);
-                            break;
-                    case MotionEvent.ACTION_UP:
-                        button.onClickUp(0);
-                        break;
-                    case MotionEvent.ACTION_POINTER_UP:
-                        button.onClickUp(0);
-                        break;
-                }
+                button.onClickUp(pointerCount - (button.getIndex() + 1));
             }
         }
         
-        lastPointerCount = pointerCount;
         return true;
     }
 }

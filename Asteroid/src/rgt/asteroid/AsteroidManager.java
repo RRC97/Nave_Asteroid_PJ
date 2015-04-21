@@ -138,7 +138,7 @@ public class AsteroidManager
         for(Asteroid asteroid : asteroids)
         {
             Path path = new Path();
-            path.addCircle(asteroid.getX(), asteroid.getY(), asteroid.getRadius()+ asteroid.getRadius() / (50 / 3), Path.Direction.CCW);
+            path.addCircle(asteroid.getX(), asteroid.getY(), asteroid.getRadius(), Path.Direction.CCW);
             
             Region region = new Region();
             region.setPath(path, new Region(0, 0, (int)screenWidth, (int)screenHeight));
